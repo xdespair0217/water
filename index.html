@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新車點交異常通報與水險管理控制台 V4</title>
+    <style>
+        :root {
+            --primary-bg: #1a252f;    /* 頂欄深藍灰 */
+            --body-bg: #dbe2e9;       /* 控制台灰色底襯 */
+            --card-bg: #ffffff;
+            --border-color: #b4c6d4;
+            --btn-peugeot: #004b93;   /* PEUGEOT 藍 */
+            --btn-citroen: #f4621b;   /* CITROËN 橘 */
+            --btn-alfa: #222222;      /* ALFA 黑 */
+            --btn-teal: #0d9488;      /* 新增的灰綠/深藍綠色 */
+            --text-main: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--primary-bg);
+            color: #ffffff;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--btn-citroen);
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .time-badge {
+            background-color: #f6c23e;
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 15px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 1400px) {
+            .container { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #eaedd0;
+            color: #1a252f;
+        }
+
+        .sop-list {
+            list-style: none;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .sop-item {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .sop-number {
+            font-weight: bold;
+            color: var(--btn-citroen);
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .highlight-red {
+            background-color: #ffe4e6;
+            border-left: 4px solid #e11d48;
+            padding: 6px;
+            color: #9f1239;
+            font-weight: bold;
+        }
+
+        /* 快捷切換鈕 - 擴充為四個選項 */
+        .brand-selectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .brand-btn {
+            padding: 10px;
+            color: white;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: opacity 0.15s;
+        }
+        .brand-btn:hover { opacity: 0.9; }
+        .bg-peugeot { background-color: var(--btn-peugeot); }
+        .bg-citroen { background-color: var(--btn-citroen); }
+        .bg-alfa { background-color: var(--btn-alfa); }
+        .bg-teal { background-color: var(--btn-teal); }
+
+        .form-group { margin-bottom: 10px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #34495e;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background-color: #f8fafc;
+        }
+
+        .preview-box {
+            background-color: #fffdec;
+            border: 1px dashed #f6c23e;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            margin-top: 8px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .btn-line { background-color: #06c755; }
+        .btn-outlook { background-color: #0078d4; }
+
+        .window-info {
+            background-color: #f1f5f9;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid #cbd5e1;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📋 新車點交異常通報與水險管理控制台</h1>
+        <div class="time-badge">規範、窗口與郵件三合一系統 V4</div>
+    </header>
+
+    <div class="container">
+        
+        <div class="card">
+            <div>
+                <div class="card-title">📢 新車點交與運輸受損理賠 SOP 看板</div>
+                <ul class="sop-list">
+                    <li class="sop-item">
+                        <span class="sop-number">1</span>
+                        新車抵達各經銷商據點時，應立即確認車輛外觀及內裝瑕疵或附件短缺，並於「新車點交單」上詳細記錄損壞或附件短缺情況並拍照存證。
+                    </li>
+                    <li class="sop-item">
+                        <span class="sop-number">2⏱️ 時效卡控</span>
+                        申請新車運輸受損理賠時，請於車到<span style="color:red; font-weight:bold;">1天內</span>向總代理提出申請。若是夜間到車，於<span style="color:red; font-weight:bold;">隔日中午前</span>須回報車輛損傷給予山立。
+                    </li>
+                    <li class="sop-item">
+                        <span class="sop-number">3</span>
+                        申請時，請附上受損照片(需有尺規佐證大小)、新車點交單、估價單，並 e-mail 給總代理窗口。
+                    </li>
+                    <li class="sop-item highlight-red">
+                        <span class="sop-number" style="color:#9f1239;">6⚠️ 塗裝核心要件</span>
+                        漆面塗裝於維修中應拍攝施工磨土照及完成照以便確認。
+                    </li>
+                    <li class="sop-item">
+                        <span class="sop-number">7</span>
+                        理賠項目之零件價格依寶嘉聯合零件保固索賠申請，工資價格依寶嘉聯合索賠工時申請。請用<b>PDI水險標籤</b>。
+                    </li>
+                </ul>
+            </div>
+            <div style="font-size: 0.75rem; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 5px;">
+                經銷商每月五日前彙總每車工作單、施工照，寄送總代理新車管理部
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="card-title">📝 欄位輸入與 Line 快速生成</div>
+                
+                <div class="brand-selectors">
+                    <div class="brand-btn bg-peugeot" onclick="quickFill('玻璃受損')">🪟 玻璃受損</div>
+                    <div class="brand-btn bg-citroen" onclick="quickFill('漆面受損')">🎨 漆面受損</div>
+                    <div class="brand-btn bg-alfa" onclick="quickFill('鋁圈受損')">🔘 鋁圈受損</div>
+                    <div class="brand-btn bg-teal" onclick="quickFill('燈具受損')">💡 燈具受損</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="caseNo">工單 / 案號</label>
+                        <input type="text" id="caseNo" value="TS009250">
+                    </div>
+                    <div class="form-group">
+                        <label for="locationAndName">地點與姓名</label>
+                        <input type="text" id="locationAndName" value="昆陽陳冠男">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="arrivalDate">到車日期</label>
+                        <input type="text" id="arrivalDate" value="2025/12/03">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactPerson">通知窗口稱謂</label>
+                        <input type="text" id="contactPerson" value="陳主任">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueText">異常狀況描述</label>
+                    <input type="text" id="issueText" value="左後視鏡刮傷">
+                </div>
+
+                <button class="action-btn btn-line" onclick="copyLineMessage()">
+                    💬 生成 Line 快速通報罐頭 (並自動複製)
+                </button>
+            </div>
+
+            <div>
+                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">Line 訊息預覽：</div>
+                <div class="preview-box" id="linePreview">點擊上方按鈕產出 Line 格式。</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="card-title">📬 Outlook 參數封裝與即時預覽</div>
+                
+                <div class="window-info">
+                    <strong>山立收件窗口：</strong> 詹清香、梁珈禎、陳世昌主任<br>
+                    <strong>費嘉副本窗口：</strong> 俞潔伶、袁菁蔚、劉益青
+                </div>
+
+                <input type="hidden" id="mailTo" value="icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw; chs@mail.sunlit.com.tw">
+                <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
+
+                <div style="font-size: 0.8rem; font-weight: bold; color: #555;">拼裝主旨預覽：</div>
+                <div class="preview-box" id="subjectPreview" style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold; color: #111827;"></div>
+
+                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">信件內文預覽：</div>
+                <div class="preview-box" id="emailPreview" style="background-color: #f1f5f9; border-color: #cbd5e1; color: #111827;"></div>
+            </div>
+
+            <button class="action-btn btn-outlook" onclick="triggerOutlook()">
+                🚀 一鍵調用 Outlook 發送通知信
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        function quickFill(text) {
+            document.getElementById('issueText').value = text;
+            updateFields();
+        }
+
+        function updateFields() {
+            const caseNo = document.getElementById('caseNo').value;
+            const locationAndName = document.getElementById('locationAndName').value;
+            const issueText = document.getElementById('issueText').value;
+            const arrivalDate = document.getElementById('arrivalDate').value;
+            const contactPerson = document.getElementById('contactPerson').value;
+
+            // 完美連動生成主旨與內文
+            const subjectStr = `${caseNo}🆔${locationAndName}➡️${issueText}_${arrivalDate}到車`;
+            document.getElementById('subjectPreview').innerText = subjectStr;
+
+            const emailBodyStr = `${contactPerson}您好，此部分車輛到場後點交發現的問題，麻煩請進一步指示，或由總帶接手處理。以上`;
+            document.getElementById('emailPreview').innerText = emailBodyStr;
+        }
+
+        function generateLineStr() {
+            const caseNo = document.getElementById('caseNo').value;
+            const locationAndName = document.getElementById('locationAndName').value;
+            const issueText = document.getElementById('issueText').value;
+            const arrivalDate = document.getElementById('arrivalDate').value;
+
+            return `⚠️【新車運輸點交異常通報】\n案號：${caseNo}\n對應：${locationAndName}\n狀況：${issueText}\n到車日：${arrivalDate}\n➔ 相關出險照片及通報信件已同步處理。`;
+        }
+
+        function copyLineMessage() {
+            const text = generateLineStr();
+            document.getElementById('linePreview').innerText = text;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Line 通報文字已自動複製到您的剪貼簿！');
+            });
+        }
+
+        function triggerOutlook() {
+            const mailTo = document.getElementById('mailTo').value;
+            const mailCc = document.getElementById('mailCc').value;
+            const subject = document.getElementById('subjectPreview').innerText;
+            const body = document.getElementById('emailPreview').innerText;
+
+            const encodedSubject = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+
+            window.location.href = `mailto:${mailTo}?cc=${mailCc}&subject=${encodedSubject}&body=${encodedBody}`;
+        }
+
+        const fieldIds = ['caseNo', 'locationAndName', 'issueText', 'arrivalDate', 'contactPerson'];
+        fieldIds.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateFields);
+        });
+
+        updateFields();
+    </script>
+</body>
+</html>
