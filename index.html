@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新車點交異常通報與水險管理控制台 V4</title>
+    <title>新車點交異常通報與水險管理控制台 V7</title>
     <style>
         :root {
-            --primary-bg: #1a252f;    /* 頂欄深藍灰 */
-            --body-bg: #dbe2e9;       /* 控制台灰色底襯 */
+            --primary-bg: #1a252f;    
+            --body-bg: #dbe2e9;       
             --card-bg: #ffffff;
             --border-color: #b4c6d4;
-            --btn-peugeot: #004b93;   /* PEUGEOT 藍 */
-            --btn-citroen: #f4621b;   /* CITROËN 橘 */
-            --btn-alfa: #222222;      /* ALFA 黑 */
-            --btn-teal: #0d9488;      /* 新增的灰綠/深藍綠色 */
+            --btn-peugeot: #004b93;   
+            --btn-citroen: #f4621b;   
+            --btn-alfa: #222222;      
+            --btn-teal: #0d9488;      
             --text-main: #2c3e50;
         }
 
@@ -118,7 +118,6 @@
             font-weight: bold;
         }
 
-        /* 快捷切換鈕 - 擴充為四個選項 */
         .brand-selectors {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -204,6 +203,7 @@
             font-size: 0.8rem;
             border: 1px solid #cbd5e1;
             margin-bottom: 8px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -211,11 +211,12 @@
 
     <header>
         <h1>📋 新車點交異常通報與水險管理控制台</h1>
-        <div class="time-badge">規範、窗口與郵件三合一系統 V4</div>
+        <div class="time-badge">同步窗口明細封裝版 V7</div>
     </header>
 
     <div class="container">
         
+        <!-- 左欄：官方規範看板 -->
         <div class="card">
             <div>
                 <div class="card-title">📢 新車點交與運輸受損理賠 SOP 看板</div>
@@ -247,6 +248,7 @@
             </div>
         </div>
 
+        <!-- 中欄：異常資訊高速輸入區 -->
         <div class="card">
             <div>
                 <div class="card-title">📝 欄位輸入與 Line 快速生成</div>
@@ -276,7 +278,7 @@
                     </div>
                     <div class="form-group">
                         <label for="contactPerson">通知窗口稱謂</label>
-                        <input type="text" id="contactPerson" value="陳主任">
+                        <input type="text" id="contactPerson" value="張主任、佟經理">
                     </div>
                 </div>
 
@@ -296,16 +298,18 @@
             </div>
         </div>
 
+        <!-- 右欄：Outlook 整合連動區 -->
         <div class="card">
             <div>
                 <div class="card-title">📬 Outlook 參數封裝與即時預覽</div>
                 
                 <div class="window-info">
-                    <strong>山立收件窗口：</strong> 詹清香、梁珈禎、陳世昌主任<br>
+                    <strong>山立收件窗口：</strong> 張智鈞主任、佟廣傳經理，詹清香組員、梁珈禎<br>
                     <strong>費嘉副本窗口：</strong> 俞潔伶、袁菁蔚、劉益青
                 </div>
 
-                <input type="hidden" id="mailTo" value="icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw; chs@mail.sunlit.com.tw">
+                <!-- 隱藏的封裝信箱參數 -->
+                <input type="hidden" id="mailTo" value="3c@mail.sunlit.com.tw; jeff@mail.sunlit.com.tw; icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw">
                 <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
 
                 <div style="font-size: 0.8rem; font-weight: bold; color: #555;">拼裝主旨預覽：</div>
@@ -335,11 +339,18 @@
             const arrivalDate = document.getElementById('arrivalDate').value;
             const contactPerson = document.getElementById('contactPerson').value;
 
-            // 完美連動生成主旨與內文
+            // 完美拼接主旨
             const subjectStr = `${caseNo}🆔${locationAndName}➡️${issueText}_${arrivalDate}到車`;
             document.getElementById('subjectPreview').innerText = subjectStr;
 
-            const emailBodyStr = `${contactPerson}您好，此部分車輛到場後點交發現的問題，麻煩請進一步指示，或由總代理接手處理。以上`;
+            // 完美移植：明碼宣告所有窗口對應的第一行格式
+            let emailBodyStr = `同步知會：\n`;
+            emailBodyStr += `山立收件窗口： 張智鈞主任、佟廣傳經理，詹清香組員、梁珈禎\n`;
+            emailBodyStr += `費嘉副本窗口： 俞潔伶、袁菁蔚、劉益青\n\n`;
+            emailBodyStr += `${contactPerson} 您好，\n\n`;
+            emailBodyStr += `此部分車輛到場後點交發現的問題，麻煩請進一步指示，或由總代理接手處理。\n\n`;
+            emailBodyStr += `以上`;
+
             document.getElementById('emailPreview').innerText = emailBodyStr;
         }
 
