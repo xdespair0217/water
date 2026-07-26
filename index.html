@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新車點交異常通報與水險管理控制台 V7</title>
+    <title>新車點交異常通報與水險管理控制台 V9</title>
     <style>
         :root {
             --primary-bg: #1a252f;    
@@ -63,6 +63,10 @@
             gap: 15px;
         }
 
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
         @media (max-width: 1400px) {
             .container { grid-template-columns: 1fr 1fr; }
         }
@@ -88,6 +92,9 @@
             padding-bottom: 6px;
             border-bottom: 2px solid #eaedd0;
             color: #1a252f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sop-list {
@@ -157,7 +164,7 @@
             gap: 10px;
         }
 
-        input[type="text"] {
+        input[type="text"], select {
             width: 100%;
             padding: 8px;
             border: 1px solid #cbd5e1;
@@ -173,9 +180,10 @@
             border-radius: 4px;
             font-family: monospace;
             white-space: pre-wrap;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #2c3e50;
             margin-top: 8px;
+            line-height: 1.6;
         }
 
         .action-btn {
@@ -195,6 +203,8 @@
         }
         .btn-line { background-color: #06c755; }
         .btn-outlook { background-color: #0078d4; }
+        .btn-add { background-color: #2b6cb0; width: auto; padding: 6px 14px; font-size: 0.85rem; }
+        .btn-remove { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
 
         .window-info {
             background-color: #f1f5f9;
@@ -205,18 +215,42 @@
             margin-bottom: 8px;
             line-height: 1.4;
         }
+
+        /* 批次輸入區表格 */
+        .batch-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .batch-table th {
+            background-color: #edf2f7;
+            text-align: left;
+            padding: 8px;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .batch-table td {
+            padding: 6px 4px;
+        }
+
+        .select-flex {
+            display: flex;
+            gap: 4px;
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>📋 新車點交異常通報與水險管理控制台</h1>
-        <div class="time-badge">同步窗口明細封裝版 V7</div>
+        <div class="time-badge">雙階選單版 V9</div>
     </header>
 
     <div class="container">
         
-        <!-- 左欄：官方規範看板 -->
+        <!-- 左欄：SOP看板 -->
         <div class="card">
             <div>
                 <div class="card-title">📢 新車點交與運輸受損理賠 SOP 看板</div>
@@ -248,10 +282,10 @@
             </div>
         </div>
 
-        <!-- 中欄：異常資訊高速輸入區 -->
+        <!-- 中欄：單件通報 -->
         <div class="card">
             <div>
-                <div class="card-title">📝 欄位輸入與 Line 快速生成</div>
+                <div class="card-title">📝 單件案件 Line / 信件預覽</div>
                 
                 <div class="brand-selectors">
                     <div class="brand-btn bg-peugeot" onclick="quickFill('玻璃受損')">🪟 玻璃受損</div>
@@ -267,14 +301,14 @@
                     </div>
                     <div class="form-group">
                         <label for="locationAndName">地點與姓名</label>
-                        <input type="text" id="locationAndName" value="昆陽陳冠男">
+                        <input type="text" id="locationAndName" value="昆陽顧明智">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="arrivalDate">到車日期</label>
-                        <input type="text" id="arrivalDate" value="2025/12/03">
+                        <input type="text" id="arrivalDate" value="2026/07/26">
                     </div>
                     <div class="form-group">
                         <label for="contactPerson">通知窗口稱謂</label>
@@ -288,17 +322,17 @@
                 </div>
 
                 <button class="action-btn btn-line" onclick="copyLineMessage()">
-                    💬 生成 Line 快速通報罐頭 (並自動複製)
+                    💬 生成單件 Line 通報 (並複製)
                 </button>
             </div>
 
             <div>
-                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">Line 訊息預覽：</div>
+                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">Line 單件預覽：</div>
                 <div class="preview-box" id="linePreview">點擊上方按鈕產出 Line 格式。</div>
             </div>
         </div>
 
-        <!-- 右欄：Outlook 整合連動區 -->
+        <!-- 右欄：Outlook -->
         <div class="card">
             <div>
                 <div class="card-title">📬 Outlook 參數封裝與即時預覽</div>
@@ -308,7 +342,6 @@
                     <strong>費嘉副本窗口：</strong> 俞潔伶、袁菁蔚、劉益青
                 </div>
 
-                <!-- 隱藏的封裝信箱參數 -->
                 <input type="hidden" id="mailTo" value="3c@mail.sunlit.com.tw; jeff@mail.sunlit.com.tw; icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw">
                 <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
 
@@ -324,9 +357,61 @@
             </button>
         </div>
 
+        <!-- 底部區：雙階選單批次簡訊生成器 -->
+        <div class="card full-width-card" style="border: 2px solid #06c755;">
+            <div>
+                <div class="card-title">
+                    <span>📱 每日到車簡訊罐頭生成器（雙階選單批次匯整）</span>
+                    <button class="action-btn btn-add" onclick="addVehicleRow()">➕ 新增車輛項目</button>
+                </div>
+
+                <div class="form-row" style="grid-template-columns: 200px 1fr; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label for="batchDate">到車日期</label>
+                        <input type="text" id="batchDate" value="2026/07/26">
+                    </div>
+                </div>
+
+                <!-- 批次清單表單 -->
+                <table class="batch-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">車身號碼 (8碼)</th>
+                            <th style="width: 15%;">1. 選擇區域/類型</th>
+                            <th style="width: 25%;">2. 選擇業務/人員</th>
+                            <th style="width: 30%;">異常狀況描述</th>
+                            <th style="width: 10%;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleTableBody">
+                        <!-- 動態插入列 -->
+                    </tbody>
+                </table>
+
+                <button class="action-btn btn-line" style="margin-top: 15px;" onclick="copyBatchLineMessage()">
+                    📋 複製 Line 批次訊息至剪貼簿
+                </button>
+            </div>
+
+            <div>
+                <div style="font-size: 0.85rem; font-weight: bold; margin-top: 12px; color: #1a252f;">Line 罐頭訊息即時預覽：</div>
+                <div class="preview-box" id="batchLinePreview" style="font-size: 0.95rem; background-color: #f0fdf4; border-color: #22c55e;"></div>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        // 據點與人員資料結構（完全依您的指定順序）
+        const salesData = {
+            "庫存車": ["庫存車"],
+            "內湖": ["李妍蓁", "陳冠男", "蔣承翰"],
+            "昆陽": ["顧明智", "邱創靖"],
+            "板橋": ["吳名融", "李湘君"],
+            "松江": ["嚴那瑜", "李宇軒"],
+            "北投": ["許珈甄", "康桓齊", "劉繼隆", "陳柏宇"]
+        };
+
         function quickFill(text) {
             document.getElementById('issueText').value = text;
             updateFields();
@@ -339,11 +424,9 @@
             const arrivalDate = document.getElementById('arrivalDate').value;
             const contactPerson = document.getElementById('contactPerson').value;
 
-            // 完美拼接主旨
             const subjectStr = `${caseNo}🆔${locationAndName}➡️${issueText}_${arrivalDate}到車`;
             document.getElementById('subjectPreview').innerText = subjectStr;
 
-            // 完美移植：明碼宣告所有窗口對應的第一行格式
             let emailBodyStr = `同步知會：\n`;
             emailBodyStr += `山立收件窗口： 張智鈞主任、佟廣傳經理，詹清香組員、梁珈禎\n`;
             emailBodyStr += `費嘉副本窗口： 俞潔伶、袁菁蔚、劉益青\n\n`;
@@ -367,7 +450,7 @@
             const text = generateLineStr();
             document.getElementById('linePreview').innerText = text;
             navigator.clipboard.writeText(text).then(() => {
-                alert('Line 通報文字已自動複製到您的剪貼簿！');
+                alert('Line 通報文字已複製到剪貼簿！');
             });
         }
 
@@ -383,10 +466,149 @@
             window.location.href = `mailto:${mailTo}?cc=${mailCc}&subject=${encodedSubject}&body=${encodedBody}`;
         }
 
+        /* --- 雙階下拉選單邏輯 --- */
+        function populateRegions(regionSelect) {
+            regionSelect.innerHTML = '<option value="">--請選擇區域--</option>';
+            Object.keys(salesData).forEach(region => {
+                const opt = document.createElement('option');
+                opt.value = region;
+                opt.innerText = region;
+                regionSelect.appendChild(opt);
+            });
+        }
+
+        function onRegionChange(regionSelect) {
+            const row = regionSelect.closest('tr');
+            const personSelect = row.querySelector('.v-person-select');
+            const customInput = row.querySelector('.v-sales-custom');
+            const selectedRegion = regionSelect.value;
+
+            personSelect.innerHTML = '<option value="">--請選擇人員--</option>';
+            customInput.style.display = 'none';
+
+            if (selectedRegion && salesData[selectedRegion]) {
+                salesData[selectedRegion].forEach(person => {
+                    const opt = document.createElement('option');
+                    opt.value = person;
+                    opt.innerText = person;
+                    personSelect.appendChild(opt);
+                });
+            }
+            
+            // 加入自訂選項
+            const customOpt = document.createElement('option');
+            customOpt.value = 'custom';
+            customOpt.innerText = '＋ 手動輸入姓名';
+            personSelect.appendChild(customOpt);
+
+            generateBatchLineMessage();
+        }
+
+        function onPersonChange(personSelect) {
+            const row = personSelect.closest('tr');
+            const customInput = row.querySelector('.v-sales-custom');
+            if (personSelect.value === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+            generateBatchLineMessage();
+        }
+
+        function addVehicleRow(defaultVin = '', defaultRegion = '', defaultPerson = '', defaultIssue = '') {
+            const tbody = document.getElementById('vehicleTableBody');
+            const tr = document.createElement('tr');
+            tr.className = 'vehicle-row';
+            tr.innerHTML = `
+                <td><input type="text" class="v-vin" placeholder="例: TW194203" value="${defaultVin}" oninput="generateBatchLineMessage()"></td>
+                <td>
+                    <select class="v-region-select" onchange="onRegionChange(this)"></select>
+                </td>
+                <td>
+                    <select class="v-person-select" onchange="onPersonChange(this)"></select>
+                    <input type="text" class="v-sales-custom" placeholder="請輸入自訂姓名" style="display:none; margin-top:4px;" oninput="generateBatchLineMessage()">
+                </td>
+                <td><input type="text" class="v-issue" placeholder="例: 左後葉漆面刮傷" value="${defaultIssue}" oninput="generateBatchLineMessage()"></td>
+                <td><button class="btn-remove" onclick="removeVehicleRow(this)">刪除</button></td>
+            `;
+            tbody.appendChild(tr);
+
+            const regionSelect = tr.querySelector('.v-region-select');
+            populateRegions(regionSelect);
+
+            if (defaultRegion) {
+                regionSelect.value = defaultRegion;
+                onRegionChange(regionSelect);
+                if (defaultPerson) {
+                    const personSelect = tr.querySelector('.v-person-select');
+                    personSelect.value = defaultPerson;
+                }
+            }
+
+            generateBatchLineMessage();
+        }
+
+        function removeVehicleRow(btn) {
+            const row = btn.closest('tr');
+            row.remove();
+            generateBatchLineMessage();
+        }
+
+        function generateBatchLineMessage() {
+            const batchDate = document.getElementById('batchDate').value;
+            let msg = `${batchDate} 到車 資料已傳\n`;
+
+            const rows = document.querySelectorAll('.vehicle-row');
+            rows.forEach(row => {
+                const vin = row.querySelector('.v-vin').value.trim();
+                const region = row.querySelector('.v-region-select').value;
+                const personSelectVal = row.querySelector('.v-person-select').value;
+                const customSales = row.querySelector('.v-sales-custom').value.trim();
+                
+                let person = personSelectVal;
+                if (personSelectVal === 'custom') {
+                    person = customSales;
+                }
+
+                const issue = row.querySelector('.v-issue').value.trim();
+
+                if (vin || region || person || issue) {
+                    // 如果選擇庫存車，輸出顯示「庫存車」；若其他據點則輸出「據點+姓名」
+                    let targetStr = "";
+                    if (region === "庫存車") {
+                        targetStr = "庫存車";
+                    } else if (region && person) {
+                        targetStr = `${region}${person}`;
+                    } else if (person) {
+                        targetStr = person;
+                    }
+
+                    msg += `${vin}🆔${targetStr}➡️${issue}\n`;
+                }
+            });
+
+            document.getElementById('batchLinePreview').innerText = msg.trim();
+            return msg.trim();
+        }
+
+        function copyBatchLineMessage() {
+            const text = generateBatchLineMessage();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('批次 Line 罐頭訊息已成功複製！');
+            });
+        }
+
+        // 綁定事件與初始化預設資料
         const fieldIds = ['caseNo', 'locationAndName', 'issueText', 'arrivalDate', 'contactPerson'];
         fieldIds.forEach(id => {
             document.getElementById(id).addEventListener('input', updateFields);
         });
+
+        document.getElementById('batchDate').addEventListener('input', generateBatchLineMessage);
+
+        // 預設寫入兩筆對應資料
+        addVehicleRow('TW194203', '松江', '李宇軒', '左後葉漆面刮傷');
+        addVehicleRow('TG712372', '板橋', '李湘君', '右前門掉漆');
 
         updateFields();
     </script>
