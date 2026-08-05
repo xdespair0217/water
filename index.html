@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新車點交異常通報與水險管理控制台 V9</title>
+    <title>新車點交異常通報與水險管理控制台 V11</title>
     <style>
         :root {
             --primary-bg: #1a252f;    
-            --body-bg: #dbe2e9;       
+            --body-bg: #cbd5e1;       
             --card-bg: #ffffff;
-            --border-color: #b4c6d4;
+            --border-color: #94a3b8;
             --btn-peugeot: #004b93;   
             --btn-citroen: #f4621b;   
             --btn-alfa: #222222;      
             --btn-teal: #0d9488;      
-            --text-main: #2c3e50;
+            --text-main: #1e293b;
         }
 
         * {
@@ -27,120 +27,133 @@
         body {
             background-color: var(--body-bg);
             color: var(--text-main);
-            padding-bottom: 40px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
             background-color: var(--primary-bg);
             color: #ffffff;
-            padding: 12px 20px;
+            padding: 6px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 3px solid var(--btn-citroen);
+            flex-shrink: 0;
         }
 
         header h1 {
-            font-size: 1.3rem;
+            font-size: 1.05rem;
             letter-spacing: 1px;
         }
 
         .time-badge {
             background-color: #f6c23e;
             color: #000;
-            padding: 4px 12px;
+            padding: 2px 8px;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
+        /* 主容器改用 Flex 縱向排列，達到真正的 1:1 上下等比例平衡 */
         .container {
-            max-width: 1800px;
-            margin: 15px auto;
-            padding: 0 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px;
+            max-width: 1920px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 40px);
+        }
+
+        .top-row {
+            flex: 1;
             display: grid;
-            grid-template-columns: 0.9fr 1.1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 0.85fr 1.15fr 1fr;
+            gap: 8px;
+            min-height: 0; /* 允許內部伸縮，不硬撐高 */
         }
 
-        .full-width-card {
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 1400px) {
-            .container { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 900px) {
-            .container { grid-template-columns: 1fr; }
+        .bottom-row {
+            flex: 1;
+            display: flex;
+            min-height: 0;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 8px 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden;
+            height: 100%;
         }
 
         .card-title {
-            font-size: 1.05rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
             border-bottom: 2px solid #eaedd0;
             color: #1a252f;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .sop-list {
             list-style: none;
-            font-size: 0.85rem;
-            line-height: 1.5;
+            font-size: 0.75rem;
+            line-height: 1.35;
         }
 
         .sop-item {
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+            margin-bottom: 4px;
+            padding-bottom: 3px;
             border-bottom: 1px dashed #e2e8f0;
         }
 
         .sop-number {
             font-weight: bold;
             color: var(--btn-citroen);
-            font-size: 1rem;
-            display: block;
-            margin-bottom: 2px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-right: 4px;
         }
 
         .highlight-red {
             background-color: #ffe4e6;
-            border-left: 4px solid #e11d48;
-            padding: 6px;
+            border-left: 3px solid #e11d48;
+            padding: 3px 5px;
             color: #9f1239;
             font-weight: bold;
         }
 
         .brand-selectors {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
         }
 
         .brand-btn {
-            padding: 10px;
+            padding: 4px 2px;
             color: white;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 4px;
+            border-radius: 3px;
             font-weight: bold;
             text-align: center;
             cursor: pointer;
-            font-size: 0.88rem;
+            font-size: 0.75rem;
             transition: opacity 0.15s;
         }
         .brand-btn:hover { opacity: 0.9; }
@@ -149,95 +162,100 @@
         .bg-alfa { background-color: var(--btn-alfa); }
         .bg-teal { background-color: var(--btn-teal); }
 
-        .form-group { margin-bottom: 10px; }
+        .form-group { margin-bottom: 3px; }
         .form-group label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.72rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 1px;
             color: #34495e;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 6px;
         }
 
         input[type="text"], select {
             width: 100%;
-            padding: 8px;
+            padding: 2px 6px;
             border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
             background-color: #f8fafc;
+            height: 25px;
         }
 
         .preview-box {
             background-color: #fffdec;
             border: 1px dashed #f6c23e;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 6px;
+            border-radius: 3px;
             font-family: monospace;
             white-space: pre-wrap;
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             color: #2c3e50;
-            margin-top: 8px;
-            line-height: 1.6;
+            line-height: 1.3;
+            overflow-y: auto;
         }
 
         .action-btn {
             width: 100%;
-            padding: 12px;
+            padding: 5px;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 4px;
+            margin-top: 4px;
+            flex-shrink: 0;
         }
         .btn-line { background-color: #06c755; }
         .btn-outlook { background-color: #0078d4; }
-        .btn-add { background-color: #2b6cb0; width: auto; padding: 6px 14px; font-size: 0.85rem; }
-        .btn-remove { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .btn-add { background-color: #2b6cb0; width: auto; padding: 2px 8px; font-size: 0.75rem; }
+        .btn-remove { background-color: #e53e3e; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; height: 25px;}
 
         .window-info {
             background-color: #f1f5f9;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            padding: 4px 6px;
+            border-radius: 3px;
+            font-size: 0.72rem;
             border: 1px solid #cbd5e1;
-            margin-bottom: 8px;
-            line-height: 1.4;
+            margin-bottom: 4px;
+            line-height: 1.25;
         }
 
-        /* 批次輸入區表格 */
+        /* 底部批次佈局 */
+        .batch-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 10px;
+            align-items: stretch;
+            flex: 1;
+            min-height: 0;
+        }
+
         .batch-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 8px;
         }
 
         .batch-table th {
             background-color: #edf2f7;
             text-align: left;
-            padding: 8px;
-            font-size: 0.85rem;
+            padding: 3px 6px;
+            font-size: 0.75rem;
             color: #4a5568;
         }
 
         .batch-table td {
-            padding: 6px 4px;
-        }
-
-        .select-flex {
-            display: flex;
-            gap: 4px;
+            padding: 2px 3px;
         }
     </style>
 </head>
@@ -245,171 +263,164 @@
 
     <header>
         <h1>📋 新車點交異常通報與水險管理控制台</h1>
-        <div class="time-badge">雙階選單版 V9</div>
+        <div class="time-badge">等比例單頁版 V11</div>
     </header>
 
     <div class="container">
         
-        <!-- 左欄：SOP看板 -->
-        <div class="card">
-            <div>
-                <div class="card-title">📢 新車點交與運輸受損理賠 SOP 看板</div>
-                <ul class="sop-list">
-                    <li class="sop-item">
-                        <span class="sop-number">1</span>
-                        新車抵達各經銷商據點時，應立即確認車輛外觀及內裝瑕疵或附件短缺，並於「新車點交單」上詳細記錄損壞或附件短缺情況並拍照存證。
-                    </li>
-                    <li class="sop-item">
-                        <span class="sop-number">2⏱️ 時效卡控</span>
-                        申請新車運輸受損理賠時，請於車到<span style="color:red; font-weight:bold;">1天內</span>向總代理提出申請。若是夜間到車，於<span style="color:red; font-weight:bold;">隔日中午前</span>須回報車輛損傷給予山立。
-                    </li>
-                    <li class="sop-item">
-                        <span class="sop-number">3</span>
-                        申請時，請附上受損照片(需有尺規佐證大小)、新車點交單、估價單，並 e-mail 給總代理窗口。
-                    </li>
-                    <li class="sop-item highlight-red">
-                        <span class="sop-number" style="color:#9f1239;">6⚠️ 塗裝核心要件</span>
-                        漆面塗裝於維修中應拍攝施工磨土照及完成照以便確認。
-                    </li>
-                    <li class="sop-item">
-                        <span class="sop-number">7</span>
-                        理賠項目之零件價格依寶嘉聯合零件保固索賠申請，工資價格依寶嘉聯合索賠工時申請。請用<b>PDI水險標籤</b>。
-                    </li>
-                </ul>
+        <!-- 上半部：三個看板 (佔 50% 高度) -->
+        <div class="top-row">
+            <!-- 左欄：SOP看板 -->
+            <div class="card">
+                <div>
+                    <div class="card-title">📢 點交與運輸受損理賠 SOP</div>
+                    <ul class="sop-list">
+                        <li class="sop-item">
+                            <span class="sop-number">1.</span>點交時確認外觀/內裝瑕疵或短缺，於點交單記錄拍照。
+                        </li>
+                        <li class="sop-item">
+                            <span class="sop-number">2. 時效：</span>車到<span style="color:red; font-weight:bold;">1天內</span>向總代理提出。夜間到車於<span style="color:red; font-weight:bold;">隔日中午前</span>回報山立。
+                        </li>
+                        <li class="sop-item">
+                            <span class="sop-number">3.</span>附受損照(尺規佐證)、點交單、估價單 email 至總代理。
+                        </li>
+                        <li class="sop-item highlight-red">
+                            <span class="sop-number" style="color:#9f1239;">6. 塗裝要件：</span>漆面維修需拍施工磨土照及完成照。
+                        </li>
+                        <li class="sop-item">
+                            <span class="sop-number">7.</span>零件與工資依寶嘉標準，請用 <b>PDI 水險標籤</b>。
+                        </li>
+                    </ul>
+                </div>
+                <div style="font-size: 0.7rem; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 3px;">
+                    每月5日前彙總工作單與照片寄總代理
+                </div>
             </div>
-            <div style="font-size: 0.75rem; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 5px;">
-                經銷商每月五日前彙總每車工作單、施工照，寄送總代理新車管理部
+
+            <!-- 中欄：單件通報 -->
+            <div class="card">
+                <div>
+                    <div class="card-title">📝 單件案件 Line / 信件預覽</div>
+                    
+                    <div class="brand-selectors">
+                        <div class="brand-btn bg-peugeot" onclick="quickFill('玻璃受損')">🪟 玻璃</div>
+                        <div class="brand-btn bg-citroen" onclick="quickFill('漆面受損')">🎨 漆面</div>
+                        <div class="brand-btn bg-alfa" onclick="quickFill('鋁圈受損')">🔘 鋁圈</div>
+                        <div class="brand-btn bg-teal" onclick="quickFill('燈具受損')">💡 燈具</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="caseNo">工單 / 案號</label>
+                            <input type="text" id="caseNo" value="TS009250">
+                        </div>
+                        <div class="form-group">
+                            <label for="locationAndName">地點與姓名</label>
+                            <input type="text" id="locationAndName" value="昆陽顧明智">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="arrivalDate">到車日期</label>
+                            <input type="text" id="arrivalDate" value="2026/07/26">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactPerson">通知窗口</label>
+                            <input type="text" id="contactPerson" value="張主任、佟經理">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issueText">異常狀況描述</label>
+                        <input type="text" id="issueText" value="左後視鏡刮傷">
+                    </div>
+
+                    <button class="action-btn btn-line" onclick="copyLineMessage()">💬 生成單件 Line 通報 (複製)</button>
+                </div>
+
+                <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-top: 4px;">
+                    <div class="preview-box" id="linePreview" style="flex: 1;">點擊上方按鈕產出 Line 格式。</div>
+                </div>
+            </div>
+
+            <!-- 右欄：Outlook -->
+            <div class="card">
+                <div>
+                    <div class="card-title">📬 Outlook 參數與即時預覽</div>
+                    
+                    <div class="window-info">
+                        <strong>山立：</strong> 張智鈞主任、佟廣傳經理、詹清香、梁珈禎<br>
+                        <strong>費嘉：</strong> 俞潔伶、袁菁蔚、劉益青
+                    </div>
+
+                    <input type="hidden" id="mailTo" value="3c@mail.sunlit.com.tw; jeff@mail.sunlit.com.tw; icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw">
+                    <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
+
+                    <div style="font-size: 0.72rem; font-weight: bold; color: #555;">主旨預覽：</div>
+                    <div class="preview-box" id="subjectPreview" style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold; color: #111827; padding: 3px; height: 26px;"></div>
+                </div>
+
+                <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-top: 4px;">
+                    <div style="font-size: 0.72rem; font-weight: bold; color: #555;">內文預覽：</div>
+                    <div class="preview-box" id="emailPreview" style="flex: 1; background-color: #f1f5f9; border-color: #cbd5e1; color: #111827;"></div>
+                </div>
+
+                <button class="action-btn btn-outlook" onclick="triggerOutlook()">🚀 一鍵調用 Outlook 發送</button>
             </div>
         </div>
 
-        <!-- 中欄：單件通報 -->
-        <div class="card">
-            <div>
-                <div class="card-title">📝 單件案件 Line / 信件預覽</div>
-                
-                <div class="brand-selectors">
-                    <div class="brand-btn bg-peugeot" onclick="quickFill('玻璃受損')">🪟 玻璃受損</div>
-                    <div class="brand-btn bg-citroen" onclick="quickFill('漆面受損')">🎨 漆面受損</div>
-                    <div class="brand-btn bg-alfa" onclick="quickFill('鋁圈受損')">🔘 鋁圈受損</div>
-                    <div class="brand-btn bg-teal" onclick="quickFill('燈具受損')">💡 燈具受損</div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="caseNo">工單 / 案號</label>
-                        <input type="text" id="caseNo" value="TS009250">
-                    </div>
-                    <div class="form-group">
-                        <label for="locationAndName">地點與姓名</label>
-                        <input type="text" id="locationAndName" value="昆陽顧明智">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="arrivalDate">到車日期</label>
-                        <input type="text" id="arrivalDate" value="2026/07/26">
-                    </div>
-                    <div class="form-group">
-                        <label for="contactPerson">通知窗口稱謂</label>
-                        <input type="text" id="contactPerson" value="張主任、佟經理">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="issueText">異常狀況描述</label>
-                    <input type="text" id="issueText" value="左後視鏡刮傷">
-                </div>
-
-                <button class="action-btn btn-line" onclick="copyLineMessage()">
-                    💬 生成單件 Line 通報 (並複製)
-                </button>
-            </div>
-
-            <div>
-                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">Line 單件預覽：</div>
-                <div class="preview-box" id="linePreview">點擊上方按鈕產出 Line 格式。</div>
-            </div>
-        </div>
-
-        <!-- 右欄：Outlook -->
-        <div class="card">
-            <div>
-                <div class="card-title">📬 Outlook 參數封裝與即時預覽</div>
-                
-                <div class="window-info">
-                    <strong>山立收件窗口：</strong> 張智鈞主任、佟廣傳經理，詹清香組員、梁珈禎<br>
-                    <strong>費嘉副本窗口：</strong> 俞潔伶、袁菁蔚、劉益青
-                </div>
-
-                <input type="hidden" id="mailTo" value="3c@mail.sunlit.com.tw; jeff@mail.sunlit.com.tw; icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw">
-                <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
-
-                <div style="font-size: 0.8rem; font-weight: bold; color: #555;">拼裝主旨預覽：</div>
-                <div class="preview-box" id="subjectPreview" style="background-color: #f1f5f9; border-color: #cbd5e1; font-weight: bold; color: #111827;"></div>
-
-                <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: #555;">信件內文預覽：</div>
-                <div class="preview-box" id="emailPreview" style="background-color: #f1f5f9; border-color: #cbd5e1; color: #111827;"></div>
-            </div>
-
-            <button class="action-btn btn-outlook" onclick="triggerOutlook()">
-                🚀 一鍵調用 Outlook 發送通知信
-            </button>
-        </div>
-
-        <!-- 底部區：雙階選單批次簡訊生成器 -->
-        <div class="card full-width-card" style="border: 2px solid #06c755;">
-            <div>
+        <!-- 下半部：雙階選單批次簡訊生成器 (佔 50% 高度，完全對稱) -->
+        <div class="bottom-row">
+            <div class="card" style="width: 100%; border: 2px solid #06c755;">
                 <div class="card-title">
-                    <span>📱 每日到車簡訊罐頭生成器（雙階選單批次匯整）</span>
-                    <button class="action-btn btn-add" onclick="addVehicleRow()">➕ 新增車輛項目</button>
+                    <span>📱 每日到車簡訊罐頭生成器（6輛快速輸入）</span>
+                    <button class="action-btn btn-add" onclick="addVehicleRow()">➕ 新增一列</button>
                 </div>
 
-                <div class="form-row" style="grid-template-columns: 200px 1fr; margin-bottom: 12px;">
-                    <div class="form-group">
-                        <label for="batchDate">到車日期</label>
-                        <input type="text" id="batchDate" value="2026/07/26">
+                <div class="batch-layout">
+                    <div style="display: flex; flex-direction: column; overflow-y: auto;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-shrink: 0;">
+                            <label for="batchDate" style="font-size: 0.75rem; font-weight: bold; width: 65px;">到車日期：</label>
+                            <input type="text" id="batchDate" value="2026/07/26" style="width: 120px;">
+                        </div>
+
+                        <!-- 批次清單表單 -->
+                        <table class="batch-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 22%;">車身號碼 (8碼)</th>
+                                    <th style="width: 18%;">1. 區域/類型</th>
+                                    <th style="width: 25%;">2. 業務/人員</th>
+                                    <th style="width: 28%;">異常狀況描述</th>
+                                    <th style="width: 7%;">刪</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehicleTableBody">
+                                <!-- 動態插入列 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; height: 100%; min-height: 0;">
+                        <div style="font-size: 0.75rem; font-weight: bold; color: #1a252f; flex-shrink: 0;">Line 罐頭訊息即時預覽：</div>
+                        <div class="preview-box" id="batchLinePreview" style="flex: 1; font-size: 0.8rem; background-color: #f0fdf4; border-color: #22c55e;"></div>
+                        <button class="action-btn btn-line" style="margin-top: 4px;" onclick="copyBatchLineMessage()">📋 複製 Line 批次訊息</button>
                     </div>
                 </div>
-
-                <!-- 批次清單表單 -->
-                <table class="batch-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">車身號碼 (8碼)</th>
-                            <th style="width: 15%;">1. 選擇區域/類型</th>
-                            <th style="width: 25%;">2. 選擇業務/人員</th>
-                            <th style="width: 30%;">異常狀況描述</th>
-                            <th style="width: 10%;">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vehicleTableBody">
-                        <!-- 動態插入列 -->
-                    </tbody>
-                </table>
-
-                <button class="action-btn btn-line" style="margin-top: 15px;" onclick="copyBatchLineMessage()">
-                    📋 複製 Line 批次訊息至剪貼簿
-                </button>
-            </div>
-
-            <div>
-                <div style="font-size: 0.85rem; font-weight: bold; margin-top: 12px; color: #1a252f;">Line 罐頭訊息即時預覽：</div>
-                <div class="preview-box" id="batchLinePreview" style="font-size: 0.95rem; background-color: #f0fdf4; border-color: #22c55e;"></div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // 據點與人員資料結構（完全依您的指定順序）
         const salesData = {
             "庫存車": ["庫存車"],
-            "內湖": ["李妍蓁", "陳冠男", "蔣承翰"],
+            "北投": ["劉繼隆", "康桓齊", "許珈甄", "陳柏宇"],
+            "板橋": ["許昌儒", "李品營", "蕭金元", "李維軒", "許瑀彣", "李湘君", "吳名融"],
             "昆陽": ["顧明智", "邱創靖"],
-            "板橋": ["吳名融", "李湘君"],
-            "松江": ["嚴那瑜", "李宇軒"],
-            "北投": ["許珈甄", "康桓齊", "劉繼隆", "陳柏宇"]
+            "松江": ["嚴那瑜", "李宇軒", "葉子政"],
+            "內湖": ["李妍蓁", "陳冠男", "蔣承翰"]
         };
 
         function quickFill(text) {
@@ -428,11 +439,10 @@
             document.getElementById('subjectPreview').innerText = subjectStr;
 
             let emailBodyStr = `同步知會：\n`;
-            emailBodyStr += `山立收件窗口： 張智鈞主任、佟廣傳經理，詹清香組員、梁珈禎\n`;
-            emailBodyStr += `費嘉副本窗口： 俞潔伶、袁菁蔚、劉益青\n\n`;
-            emailBodyStr += `${contactPerson} 您好，\n\n`;
-            emailBodyStr += `此部分車輛到場後點交發現的問題，麻煩請進一步指示，或由總代理接手處理。\n\n`;
-            emailBodyStr += `以上`;
+            emailBodyStr += `山立：張智鈞主任、佟廣傳經理、詹清香、梁珈禎\n`;
+            emailBodyStr += `費嘉：俞潔伶、袁菁蔚、劉益青\n\n`;
+            emailBodyStr += `${contactPerson} 您好，\n`;
+            emailBodyStr += `車輛點交發現問題，請指示或由總代理處理。\n\n以上`;
 
             document.getElementById('emailPreview').innerText = emailBodyStr;
         }
@@ -443,14 +453,14 @@
             const issueText = document.getElementById('issueText').value;
             const arrivalDate = document.getElementById('arrivalDate').value;
 
-            return `⚠️【新車運輸點交異常通報】\n案號：${caseNo}\n對應：${locationAndName}\n狀況：${issueText}\n到車日：${arrivalDate}\n➔ 相關出險照片及通報信件已同步處理。`;
+            return `⚠️【新車運輸點交異常通報】\n案號：${caseNo}\n對應：${locationAndName}\n狀況：${issueText}\n到車日：${arrivalDate}\n➔ 照片及信件已同步。`;
         }
 
         function copyLineMessage() {
             const text = generateLineStr();
             document.getElementById('linePreview').innerText = text;
             navigator.clipboard.writeText(text).then(() => {
-                alert('Line 通報文字已複製到剪貼簿！');
+                alert('Line 通報文字已複製！');
             });
         }
 
@@ -460,15 +470,12 @@
             const subject = document.getElementById('subjectPreview').innerText;
             const body = document.getElementById('emailPreview').innerText;
 
-            const encodedSubject = encodeURIComponent(subject);
-            const encodedBody = encodeURIComponent(body);
-
-            window.location.href = `mailto:${mailTo}?cc=${mailCc}&subject=${encodedSubject}&body=${encodedBody}`;
+            window.location.href = `mailto:${mailTo}?cc=${mailCc}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
 
         /* --- 雙階下拉選單邏輯 --- */
         function populateRegions(regionSelect) {
-            regionSelect.innerHTML = '<option value="">--請選擇區域--</option>';
+            regionSelect.innerHTML = '<option value="">--區域--</option>';
             Object.keys(salesData).forEach(region => {
                 const opt = document.createElement('option');
                 opt.value = region;
@@ -483,7 +490,7 @@
             const customInput = row.querySelector('.v-sales-custom');
             const selectedRegion = regionSelect.value;
 
-            personSelect.innerHTML = '<option value="">--請選擇人員--</option>';
+            personSelect.innerHTML = '<option value="">--姓名--</option>';
             customInput.style.display = 'none';
 
             if (selectedRegion && salesData[selectedRegion]) {
@@ -495,7 +502,6 @@
                 });
             }
             
-            // 加入自訂選項
             const customOpt = document.createElement('option');
             customOpt.value = 'custom';
             customOpt.innerText = '＋ 手動輸入姓名';
@@ -526,10 +532,10 @@
                 </td>
                 <td>
                     <select class="v-person-select" onchange="onPersonChange(this)"></select>
-                    <input type="text" class="v-sales-custom" placeholder="請輸入自訂姓名" style="display:none; margin-top:4px;" oninput="generateBatchLineMessage()">
+                    <input type="text" class="v-sales-custom" placeholder="輸入姓名" style="display:none; margin-top:2px;" oninput="generateBatchLineMessage()">
                 </td>
-                <td><input type="text" class="v-issue" placeholder="例: 左後葉漆面刮傷" value="${defaultIssue}" oninput="generateBatchLineMessage()"></td>
-                <td><button class="btn-remove" onclick="removeVehicleRow(this)">刪除</button></td>
+                <td><input type="text" class="v-issue" placeholder="例: 左後葉刮傷" value="${defaultIssue}" oninput="generateBatchLineMessage()"></td>
+                <td><button class="btn-remove" onclick="removeVehicleRow(this)">✕</button></td>
             `;
             tbody.appendChild(tr);
 
@@ -573,7 +579,6 @@
                 const issue = row.querySelector('.v-issue').value.trim();
 
                 if (vin || region || person || issue) {
-                    // 如果選擇庫存車，輸出顯示「庫存車」；若其他據點則輸出「據點+姓名」
                     let targetStr = "";
                     if (region === "庫存車") {
                         targetStr = "庫存車";
@@ -594,11 +599,10 @@
         function copyBatchLineMessage() {
             const text = generateBatchLineMessage();
             navigator.clipboard.writeText(text).then(() => {
-                alert('批次 Line 罐頭訊息已成功複製！');
+                alert('批次 Line 訊息已成功複製！');
             });
         }
 
-        // 綁定事件與初始化預設資料
         const fieldIds = ['caseNo', 'locationAndName', 'issueText', 'arrivalDate', 'contactPerson'];
         fieldIds.forEach(id => {
             document.getElementById(id).addEventListener('input', updateFields);
@@ -606,9 +610,18 @@
 
         document.getElementById('batchDate').addEventListener('input', generateBatchLineMessage);
 
-        // 預設寫入兩筆對應資料
-        addVehicleRow('TW194203', '松江', '李宇軒', '左後葉漆面刮傷');
-        addVehicleRow('TG712372', '板橋', '李湘君', '右前門掉漆');
+        const defaultList = [
+            { vin: 'TW194203', region: '北投', person: '劉繼隆', issue: '左後葉漆面刮傷' },
+            { vin: 'TG712372', region: '板橋', person: '許昌儒', issue: '右前門掉漆' },
+            { vin: 'TK882910', region: '昆陽', person: '顧明智', issue: '前保桿痕跡' },
+            { vin: 'TL330192', region: '板橋', person: '李品營', issue: '' },
+            { vin: 'TM501823', region: '松江', person: '嚴那瑜', issue: '' },
+            { vin: 'TN610928', region: '北投', person: '康桓齊', issue: '' }
+        ];
+
+        defaultList.forEach(item => {
+            addVehicleRow(item.vin, item.region, item.person, item.issue);
+        });
 
         updateFields();
     </script>
