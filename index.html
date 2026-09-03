@@ -220,6 +220,24 @@
         .btn-outlook { background-color: #0078d4; }
         .btn-add { background-color: #2b6cb0; width: auto; padding: 2px 8px; font-size: 0.75rem; }
         .btn-remove { background-color: #e53e3e; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; height: 25px;}
+        .btn-select { background-color: #475569; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; height: 25px;}
+        .btn-select:hover { background-color: #0284c7; }
+
+        .template-btn {
+            padding: 1px 6px;
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            color: #475569;
+            border-radius: 3px;
+            font-size: 0.68rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .template-btn.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            border-color: #0284c7;
+        }
 
         .window-info {
             background-color: #f1f5f9;
@@ -256,6 +274,10 @@
 
         .batch-table td {
             padding: 2px 3px;
+        }
+
+        .vehicle-row.active-row {
+            background-color: #e0f2fe;
         }
     </style>
 </head>
@@ -327,7 +349,7 @@
                         </div>
                         <div class="form-group">
                             <label for="contactPerson">通知窗口</label>
-                            <input type="text" id="contactPerson" value="張主任、佟經理">
+                            <input type="text" id="contactPerson" value="張主任">
                         </div>
                     </div>
 
@@ -350,11 +372,11 @@
                     <div class="card-title">📬 Outlook 參數與即時預覽</div>
                     
                     <div class="window-info">
-                        <strong>山立：</strong> 張智鈞主任、佟廣傳經理、詹清香、梁珈禎<br>
-                        <strong>費嘉：</strong> 俞潔伶、袁菁蔚、劉益青
+                        <strong>山立：</strong> 張智鈞主任<br>
+                        <strong>寶嘉：</strong> 俞潔伶、袁菁蔚、劉益青
                     </div>
 
-                    <input type="hidden" id="mailTo" value="3c@mail.sunlit.com.tw; jeff@mail.sunlit.com.tw; icar.cl@mail.sunlit.com.tw; chia@mail.sunlit.com.tw">
+                    <input type="hidden" id="mailTo" value="earthman560924@gmail.com">
                     <input type="hidden" id="mailCc" value="jessica.yu@pgu.com.tw; weiwei.yuan@pgu.com.tw; benson.liu@pgu.com.tw">
 
                     <div style="font-size: 0.72rem; font-weight: bold; color: #555;">主旨預覽：</div>
@@ -362,7 +384,13 @@
                 </div>
 
                 <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-top: 4px;">
-                    <div style="font-size: 0.72rem; font-weight: bold; color: #555;">內文預覽：</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <span style="font-size: 0.72rem; font-weight: bold; color: #555;">內文預覽：</span>
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="template-btn active" id="btnTplNormal" onclick="switchMailTemplate('normal')">一般模式</button>
+                            <button type="button" class="template-btn" id="btnTplMinsan" onclick="switchMailTemplate('minsan')">民善鈑烤備忘錄</button>
+                        </div>
+                    </div>
                     <div class="preview-box" id="emailPreview" style="flex: 1; background-color: #f1f5f9; border-color: #cbd5e1; color: #111827;"></div>
                 </div>
 
@@ -389,11 +417,12 @@
                         <table class="batch-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 22%;">車身號碼 (8碼)</th>
-                                    <th style="width: 18%;">1. 區域/類型</th>
-                                    <th style="width: 25%;">2. 業務/人員</th>
-                                    <th style="width: 28%;">異常狀況描述</th>
-                                    <th style="width: 7%;">刪</th>
+                                    <th style="width: 12%;">帶入</th>
+                                    <th style="width: 20%;">車身號碼 (8碼)</th>
+                                    <th style="width: 16%;">1. 區域/類型</th>
+                                    <th style="width: 23%;">2. 業務/人員</th>
+                                    <th style="width: 23%;">異常狀況描述</th>
+                                    <th style="width: 6%;">刪</th>
                                 </tr>
                             </thead>
                             <tbody id="vehicleTableBody">
@@ -414,6 +443,8 @@
     </div>
 
     <script>
+        let currentMailTemplate = 'normal';
+
         const salesData = {
             "庫存車": ["庫存車"],
             "北投": ["劉繼隆", "康桓齊", "許珈甄", "陳柏宇"],
@@ -422,6 +453,13 @@
             "松江": ["嚴那瑜", "李宇軒", "葉子政"],
             "內湖": ["李妍蓁", "陳冠男", "蔣承翰"]
         };
+
+        function switchMailTemplate(type) {
+            currentMailTemplate = type;
+            document.getElementById('btnTplNormal').classList.toggle('active', type === 'normal');
+            document.getElementById('btnTplMinsan').classList.toggle('active', type === 'minsan');
+            updateFields();
+        }
 
         function quickFill(text) {
             document.getElementById('issueText').value = text;
@@ -439,10 +477,15 @@
             document.getElementById('subjectPreview').innerText = subjectStr;
 
             let emailBodyStr = `同步知會：\n`;
-            emailBodyStr += `山立：張智鈞主任、佟廣傳經理、詹清香、梁珈禎\n`;
-            emailBodyStr += `費嘉：俞潔伶、袁菁蔚、劉益青\n\n`;
+            emailBodyStr += `山立：張智鈞主任\n`;
+            emailBodyStr += `寶嘉：俞潔伶、袁菁蔚、劉益青\n\n`;
             emailBodyStr += `${contactPerson} 您好，\n`;
-            emailBodyStr += `車輛點交發現問題，請指示或由總代理處理。\n\n以上`;
+
+            if (currentMailTemplate === 'minsan') {
+                emailBodyStr += `車輛點交發現問題，2跟3項問題，\n在這先做一個備忘錄，\n後續車輛拖至內湖民善鈑烤中心，\n我們再依實際狀況回報處置，\n\n以上`;
+            } else {
+                emailBodyStr += `車輛點交發現問題，請指示或由總代理處理。\n\n以上`;
+            }
 
             document.getElementById('emailPreview').innerText = emailBodyStr;
         }
@@ -521,11 +564,48 @@
             generateBatchLineMessage();
         }
 
+        /* 下方點擊串接同步至上方 */
+        function selectRowToTop(buttonOrRow) {
+            const row = buttonOrRow.classList && buttonOrRow.classList.contains('vehicle-row') ? buttonOrRow : buttonOrRow.closest('tr');
+            
+            document.querySelectorAll('.vehicle-row').forEach(r => r.classList.remove('active-row'));
+            row.classList.add('active-row');
+
+            const vin = row.querySelector('.v-vin').value.trim();
+            const region = row.querySelector('.v-region-select').value;
+            const personSelectVal = row.querySelector('.v-person-select').value;
+            const customSales = row.querySelector('.v-sales-custom').value.trim();
+            const issue = row.querySelector('.v-issue').value.trim();
+            const batchDate = document.getElementById('batchDate').value.trim();
+
+            let person = personSelectVal;
+            if (personSelectVal === 'custom') {
+                person = customSales;
+            }
+
+            let targetStr = "";
+            if (region === "庫存車") {
+                targetStr = "庫存車";
+            } else if (region && person) {
+                targetStr = `${region}${person}`;
+            } else if (person) {
+                targetStr = person;
+            }
+
+            if (vin) document.getElementById('caseNo').value = vin;
+            if (targetStr) document.getElementById('locationAndName').value = targetStr;
+            document.getElementById('issueText').value = issue;
+            if (batchDate) document.getElementById('arrivalDate').value = batchDate;
+
+            updateFields();
+        }
+
         function addVehicleRow(defaultVin = '', defaultRegion = '', defaultPerson = '', defaultIssue = '') {
             const tbody = document.getElementById('vehicleTableBody');
             const tr = document.createElement('tr');
             tr.className = 'vehicle-row';
             tr.innerHTML = `
+                <td><button type="button" class="btn-select" onclick="selectRowToTop(this)">📤 帶入</button></td>
                 <td><input type="text" class="v-vin" placeholder="例: TW194203" value="${defaultVin}" oninput="generateBatchLineMessage()"></td>
                 <td>
                     <select class="v-region-select" onchange="onRegionChange(this)"></select>
@@ -608,7 +688,9 @@
             document.getElementById(id).addEventListener('input', updateFields);
         });
 
-        document.getElementById('batchDate').addEventListener('input', generateBatchLineMessage);
+        document.getElementById('batchDate').addEventListener('input', () => {
+            generateBatchLineMessage();
+        });
 
         const defaultList = [
             { vin: 'TW194203', region: '北投', person: '劉繼隆', issue: '左後葉漆面刮傷' },
